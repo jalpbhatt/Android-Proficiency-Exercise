@@ -5,6 +5,9 @@ import android.content.Context;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Provide local disk cache in internal memory of device
+ */
 public class FileCache {
 
     private File cacheDir;

@@ -1,6 +1,5 @@
 package com.telstra.androidjsonparsing.model;
 
-
 public class Country {
 
 
@@ -9,10 +8,6 @@ public class Country {
 
     public CountryDetails[] getRows() {
         return rows;
-    }
-
-    public void setRows(CountryDetails[] rows) {
-        this.rows = rows;
     }
 
     public String getTitle() {

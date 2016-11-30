@@ -1,7 +1,9 @@
 <resources>
-    <string name="app_name">AndroidJsonParsing</string>
+    <string name="app_name">Telstra News Feed</string>
     <string name="action_refresh">Refresh</string>
 
     <string name="default_msg_no_title">No title available</string>
     <string name="default_msg_no_desc">No description available.</string>
+    <string name="error_msg">Unable to fetch data. Try after sometime.</string>
+    <string name="error_msg_no_internet_connection">No internet connection. Please try again.</string>
 </resources>

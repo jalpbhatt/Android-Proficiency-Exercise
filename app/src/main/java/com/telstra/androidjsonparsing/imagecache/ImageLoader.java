@@ -22,6 +22,10 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Responsible for fetching the image from the web, store into cache memory & displaying to the
+ * dedicated view
+ */
 public class ImageLoader {
 
     final int stub_id = R.drawable.no_image;

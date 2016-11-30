@@ -8,12 +8,16 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.telstra.androidjsonparsing.AppConfig;
+import com.telstra.androidjsonparsing.NetworkUtils;
 import com.telstra.androidjsonparsing.R;
-import com.telstra.androidjsonparsing.webservice.RequestInterface;
 import com.telstra.androidjsonparsing.model.Country;
 import com.telstra.androidjsonparsing.model.CountryDetails;
+import com.telstra.androidjsonparsing.webservice.RequestInterface;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,10 +28,15 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
 
+    /* UI variables */
     private android.support.v7.app.ActionBar mActionbar;
     private RecyclerView mRecyclerView;
+    private LinearLayout mProgressbarLayout;
+    private LinearLayout mNoConnectionLayout;
+
+    /* Reference variables */
     private ArrayList<CountryDetails> mCountryList;
     private CountryAdapter mCountryAdapter;
 
@@ -52,29 +61,48 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_refresh) {
+
+            if (NetworkUtils.isNetworkAvailable(getApplicationContext())) {
+                mNoConnectionLayout.setVisibility(View.GONE);
+                refreshCountryDetails();
+            } else {
+                mNoConnectionLayout.setVisibility(View.VISIBLE);
+            }
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void initViews(){
+    private void initViews() {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         mActionbar = getSupportActionBar();
 
-        mRecyclerView = (RecyclerView)findViewById(R.id.card_recycler_view);
+        mProgressbarLayout = (LinearLayout) findViewById(R.id.progressBarLayout);
+        mNoConnectionLayout = (LinearLayout) findViewById(R.id.noConnectionLayout);
+        mRecyclerView = (RecyclerView) findViewById(R.id.card_recycler_view);
         mRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         mRecyclerView.setLayoutManager(layoutManager);
-        executeCountryDetailsRequest(AppConfig.WEB_SERVICE_BASE_URL);
+
+        if (NetworkUtils.isNetworkAvailable(getApplicationContext())) {
+            executeCountryDetailsRequest(AppConfig.WEB_SERVICE_BASE_URL);
+        } else {
+            mNoConnectionLayout.setVisibility(View.VISIBLE);
+        }
     }
 
-    private void executeCountryDetailsRequest(String url){
+    /**
+     * Execute country detail request
+     */
+    private void executeCountryDetailsRequest(String url) {
+
+        // Show progress bar while loading list
+        mProgressbarLayout.setVisibility(View.VISIBLE);
+
         Retrofit webReqObj = new Retrofit.Builder()
                 .baseUrl(url)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -86,24 +114,45 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Country> call, Response<Country> response) {
 
+                // Hide the progress bar
+                mProgressbarLayout.setVisibility(View.GONE);
+
                 Country jsonResponse = response.body();
 
                 if (jsonResponse != null) {
 
                     // Set title of the action bar
-                    // NOTE: Should we check for null?
                     mActionbar.setTitle(jsonResponse.getTitle());
 
                     mCountryList = new ArrayList<>(Arrays.asList(jsonResponse.getRows()));
-                    mCountryAdapter = new CountryAdapter(mCountryList);
+                    mCountryAdapter = new CountryAdapter(mCountryList, MainActivity.this);
                     mRecyclerView.setAdapter(mCountryAdapter);
                 }
             }
 
             @Override
             public void onFailure(Call<Country> call, Throwable t) {
-                Log.d("Error",t.getMessage());
+                Log.d("Error", t.getMessage());
+
+                // Hide the progress bar
+                mProgressbarLayout.setVisibility(View.GONE);
+
+                // Show error message if we fail to load/fetch data
+                Toast.makeText(MainActivity.this, getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+    private void refreshCountryDetails() {
+
+        // Clear current data & update the list view
+        if (mCountryList != null && mCountryAdapter !=null) {
+            mCountryList.clear();
+            mCountryAdapter.notifyDataSetChanged();
+        }
+
+        // Reload the data
+        executeCountryDetailsRequest(AppConfig.WEB_SERVICE_BASE_URL);
+    }
+
 }

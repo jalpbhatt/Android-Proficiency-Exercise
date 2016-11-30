@@ -3,8 +3,16 @@ package com.telstra.androidjsonparsing.imagecache;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * Utility class for supporting the file operations
+ */
 public class Utils {
 
+    /**
+     *  Copy stream data bytes to output stream
+     * @param is input stream object
+     * @param os output stream object
+     */
     public static void copyStream(InputStream is, OutputStream os) {
         final int buffer_size = 1024;
         try {

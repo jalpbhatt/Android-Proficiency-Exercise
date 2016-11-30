@@ -20,16 +20,7 @@ public class CountryDetails {
         return description;
     }
 
-    public void setDesc(String mDesc) {
-        this.description = mDesc;
-    }
-
     public String getImageRef() {
         return imageHref;
     }
-
-    public void setImageRef(String mImageRef) {
-        this.imageHref = mImageRef;
-    }
-
 }
