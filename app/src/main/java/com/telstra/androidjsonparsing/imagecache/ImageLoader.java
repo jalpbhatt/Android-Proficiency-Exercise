@@ -28,6 +28,9 @@ import java.util.concurrent.Executors;
  */
 public class ImageLoader {
 
+    private static final int SOCKET_CONNECTION_TIME_OUT = 30000;
+    private static final int SOCKET_READ_TIME_OUT = 30000;
+
     final int stub_id = R.drawable.no_image;
     MemoryCache memoryCache = new MemoryCache();
     FileCache fileCache;
@@ -68,8 +71,8 @@ public class ImageLoader {
             Bitmap bitmap = null;
             URL imageUrl = new URL(url);
             HttpURLConnection conn = (HttpURLConnection) imageUrl.openConnection();
-            conn.setConnectTimeout(30000);
-            conn.setReadTimeout(30000);
+            conn.setConnectTimeout(SOCKET_CONNECTION_TIME_OUT);
+            conn.setReadTimeout(SOCKET_READ_TIME_OUT);
             conn.setInstanceFollowRedirects(true);
             InputStream is = conn.getInputStream();
             OutputStream os = new FileOutputStream(f);
