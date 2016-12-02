@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -30,16 +31,18 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
-public class NewsFeedFragment extends Fragment {
+public class NewsFeedFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     /* UI variables */
     private RecyclerView mRecyclerView;
-    private LinearLayout mProgressbarLayout;
     private LinearLayout mNoConnectionLayout;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     /* Reference variables */
     private ArrayList<CountryDetails> mCountryList;
     private CountryAdapter mCountryAdapter;
+
+    public boolean mIsSwipeToRef;
 
     private OnFragmentInteractionListener mListener;
 
@@ -91,8 +94,10 @@ public class NewsFeedFragment extends Fragment {
 
     private void initViews() {
 
-        mProgressbarLayout = (LinearLayout) getActivity().findViewById(R.id.progressBarLayout);
         mNoConnectionLayout = (LinearLayout) getActivity().findViewById(R.id.noConnectionLayout);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipe_refresh_layout);
+
+        mSwipeRefreshLayout.setOnRefreshListener(this);
 
         mRecyclerView = (RecyclerView) getActivity().findViewById(R.id.card_recycler_view);
         mRecyclerView.setHasFixedSize(true);
@@ -119,8 +124,7 @@ public class NewsFeedFragment extends Fragment {
      */
     private void executeCountryDetailsRequest(String url) {
 
-        // Show progress bar while loading list
-        mProgressbarLayout.setVisibility(View.VISIBLE);
+        mSwipeRefreshLayout.setRefreshing(true);
 
         Retrofit webReqObj = new Retrofit.Builder()
                 .baseUrl(url)
@@ -133,15 +137,17 @@ public class NewsFeedFragment extends Fragment {
             @Override
             public void onResponse(Call<Country> call, Response<Country> response) {
 
-                // Hide the progress bar
-                mProgressbarLayout.setVisibility(View.GONE);
+                mIsSwipeToRef = false;
+                mSwipeRefreshLayout.setRefreshing(false);
 
                 Country jsonResponse = response.body();
 
                 if (jsonResponse != null) {
 
                     // Set title of the action bar
-                    /*mActionbar.setTitle(jsonResponse.getTitle());*/
+                    if (mListener != null) {
+                        mListener.setActionbarTitle(jsonResponse.getTitle());
+                    }
 
                     mCountryList = new ArrayList<>(Arrays.asList(jsonResponse.getRows()));
                     mCountryAdapter = new CountryAdapter(mCountryList, getActivity());
@@ -153,8 +159,8 @@ public class NewsFeedFragment extends Fragment {
             public void onFailure(Call<Country> call, Throwable t) {
                 Log.d("Error", t.getMessage());
 
-                // Hide the progress bar
-                mProgressbarLayout.setVisibility(View.GONE);
+                mIsSwipeToRef = false;
+                mSwipeRefreshLayout.setRefreshing(false);
 
                 // Show error message if we fail to load/fetch data
                 UiUtils.showToast(getActivity().getApplicationContext(), R.string.error_msg);
@@ -174,11 +180,18 @@ public class NewsFeedFragment extends Fragment {
         executeCountryDetailsRequest(AppConfig.WEB_SERVICE_BASE_URL);
     }
 
+    @Override
+    public void onRefresh() {
+
+        mIsSwipeToRef = true;
+        refreshCountryDetails();
+    }
+
     /**
      * Communication interface
      */
     public interface OnFragmentInteractionListener {
 
-        void onFragmentInteraction();
+        void setActionbarTitle(String title);
     }
 }

@@ -54,13 +54,11 @@ public class MainActivity extends AppCompatActivity implements NewsFeedFragment.
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.action_refresh) {
-
+        NewsFeedFragment fragment = ((NewsFeedFragment) mNewsFeedFragment);
+        if (id == R.id.action_refresh && !fragment.mIsSwipeToRef) {
             if (NetworkUtils.isNetworkAvailable(getApplicationContext())) {
-
-                ((NewsFeedFragment) mNewsFeedFragment).hideConnectionLayout();
-                ((NewsFeedFragment) mNewsFeedFragment).refreshCountryDetails();
-
+                fragment.hideConnectionLayout();
+                fragment.refreshCountryDetails();
             } else {
                 UiUtils.showToast(getApplicationContext(), R.string.error_msg_no_internet_connection);
             }
@@ -70,8 +68,10 @@ public class MainActivity extends AppCompatActivity implements NewsFeedFragment.
     }
 
     @Override
-    public void onFragmentInteraction() {
+    public void setActionbarTitle(String title) {
 
+        if (mActionbar != null) {
+            mActionbar.setTitle(title);
+        }
     }
-
 }
