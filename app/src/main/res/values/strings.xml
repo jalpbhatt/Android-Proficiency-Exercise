@@ -6,4 +6,5 @@
     <string name="default_msg_no_desc">No description available.</string>
     <string name="error_msg">Unable to fetch data. Try after sometime.</string>
     <string name="error_msg_no_internet_connection">No internet connection. Please try again.</string>
+
 </resources>

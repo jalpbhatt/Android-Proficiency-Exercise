@@ -21,22 +21,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <LinearLayout
-        android:id="@+id/progressBarLayout"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <ProgressBar
-            android:id="@+id/pb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-        </ProgressBar>
-    </LinearLayout>
-
     <include layout="@layout/content_main" />
 
 

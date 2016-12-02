@@ -1,4 +1,4 @@
-package com.telstra.androidjsonparsing;
+package com.telstra.androidjsonparsing.utils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -21,8 +21,7 @@ public class NetworkUtils {
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null &&
+        return activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
-        return isConnected;
     }
 }

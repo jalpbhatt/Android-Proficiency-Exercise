@@ -25,9 +25,13 @@ public class CountryAdapter extends RecyclerView.Adapter<CountryAdapter.ViewHold
 
 
     public CountryAdapter(ArrayList<CountryDetails> android, Context context) {
+
         this.mCountyDetailsList = android;
         this.mContext = context;
-        mImageLoader = new ImageLoader(mContext.getApplicationContext());
+
+        if (mContext != null) {
+            mImageLoader = new ImageLoader(mContext.getApplicationContext());
+        }
     }
 
     @Override
